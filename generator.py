@@ -7,6 +7,7 @@ Operates under a couple very simple (but restrictive rules):
     3. Hyperlinks to other parts of the website are done using the live link (no intelligent deduction here)
     4. Headers no deeper than level 3 (### or <h3>)
     5. No nested lists
+    6. Links using []() will have no markup in the link text enclosed in []
 
 ToDo:
     - [ ] Add support for code snippets/monospace fonts (`` and ``` ```)
@@ -72,7 +73,7 @@ def parse_md(file_md_path, file_html_path):
         else:
             for i, val in enumerate(line_split):
                 # Header
-                if val[0] == '#' and i == 0:
+                if i == 0 and val[0] == '#':
                     is_header = True
                     val_len = len(val)
                     if val_len == 1:
@@ -85,7 +86,7 @@ def parse_md(file_md_path, file_html_path):
                         f_html.write('<h3>')
                         line_stack.append('</h3>')
                 # Unordered List
-                elif val == '-' and i == 0:
+                elif i == 0 and val == '-':
                     if is_ordered_list:
                         f_html.write('<li>')
                     else:
