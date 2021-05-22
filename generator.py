@@ -25,10 +25,10 @@ Regular expression (Regex) to parse markdown
 Supports headers, links, images, bold, italics
 outer () to keep the "splitting content"
 outer [] to split by everything between them
-split by !, #, *, [, ], (, )
+split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 + to keep groups of these together (so **, ![, ###, etc.)
 """
-md_pattern = re.compile(r'([-!#\*\[\]\(\)]+)')
+md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
 def get_files(root):
     files = []
@@ -53,6 +53,7 @@ def parse_md(file_md_path, file_html_path):
     is_paragraph = False
     is_link = False
     is_image = False
+    is_code = False
 
     # variables to store hyperlinks/image links and alt text while parsing
     alt_string = ''
@@ -74,6 +75,7 @@ def parse_md(file_md_path, file_html_path):
             is_unordered_list = False
             is_paragraph = False
             is_header = False
+            is_code = False
         # Content line
         else:
             for i, val in enumerate(line_split):
@@ -109,6 +111,16 @@ def parse_md(file_md_path, file_html_path):
                         file_stack.append('</ol>')
                     f_html.write(val[2:])
                     line_stack.append('</li>')
+                # Code block
+                elif i == 0 and val == '```':
+                    if is_code:
+                        is_code = False
+                        f_html.write('</code></pre>')
+                    else:
+                        is_code = True
+                        f_html.write('<pre><code>')
+                elif is_code:
+                    f_html.write(val)
                 # Image opening
                 elif val == '![' and line_split[i+2] == '](' and line_split[i+4] == ')':
                     is_image = True
@@ -164,6 +176,15 @@ def parse_md(file_md_path, file_html_path):
                         else:
                             f_html.write('<i><b>')
                             line_stack.append('</i></b>')
+                    # Monospace
+                    elif val == '`':
+                        # if we're at the closing `
+                        if (len(line_stack) != 0 and line_stack[-1] == '</code>'):
+                            f_html.write(line_stack.pop())
+                        # we're at the opening `
+                        else:
+                            f_html.write('<code>')
+                            line_stack.append('</code>')
                     # Link opening
                     elif val == '[' and line_split[i+2] == '](' and line_split[i+4] == ')':
                         is_link = True
