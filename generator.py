@@ -8,10 +8,10 @@ Operates under a couple very simple (but restrictive rules):
     4. Headers no deeper than level 3 (### or <h3>)
     5. No nested lists
     6. Links using []() will have no markup in the link text enclosed in []
+    7. No exclamation marks at the end of an image or link (since the ! will get grouped with the ) by RegEx
 
 ToDo:
     - [ ] Add support for code snippets/monospace fonts (`` and ``` ```)
-    - [ ] Add support for links and images
     - [ ] Add header and footer html
     - [ ] Everything associated with file paths, referencing images and other articles, etc.
 """
@@ -51,6 +51,12 @@ def parse_md(file_md_path, file_html_path):
     is_ordered_list = False
     is_header = False
     is_paragraph = False
+    is_link = False
+    is_image = False
+
+    # variables to store hyperlinks/image links and alt text while parsing
+    alt_string = ''
+    link_string = ''
     
     # open returns iterable object, allowing for easy line-by-line
     for line in f_md:
@@ -59,7 +65,6 @@ def parse_md(file_md_path, file_html_path):
         line_split = re.split(md_pattern,line)
         # special characters will be padded in the list on either side with '' (empty character); remove these using list comprehension
         line_split = [i for i in line_split if i != '']
-        print(line_split) 
         # Blank line
         if len(line_split) == 0:
             if is_ordered_list or is_unordered_list or is_paragraph:
@@ -104,6 +109,26 @@ def parse_md(file_md_path, file_html_path):
                         file_stack.append('</ol>')
                     f_html.write(val[2:])
                     line_stack.append('</li>')
+                # Image opening
+                elif val == '![' and line_split[i+2] == '](' and line_split[i+4] == ')':
+                    is_image = True
+                # Image middle through end
+                elif is_image:
+                    # center of image, ignore it
+                    if val == '](':
+                        pass
+                    # end of image, create the string and write it to the file
+                    elif val == ')':
+                        is_image = False
+                        f_html.write('<img src=\"' + link_string + '\" alt=\"' + alt_string + '\">')
+                        alt_string = ''
+                        link_string = ''
+                    # alt text
+                    elif line_split[i+1] == '](':
+                        alt_string = val
+                    # link text is the only other position
+                    else:
+                        link_string = val
                 # Other text
                 else:
                     # Paragraph
@@ -139,6 +164,26 @@ def parse_md(file_md_path, file_html_path):
                         else:
                             f_html.write('<i><b>')
                             line_stack.append('</i></b>')
+                    # Link opening
+                    elif val == '[' and line_split[i+2] == '](' and line_split[i+4] == ')':
+                        is_link = True
+                    # Link middle through end
+                    elif is_link:
+                        # center of link, ignore it
+                        if val == '](':
+                            pass
+                        # end of link, create the string and write it to the file
+                        elif val == ')':
+                            is_link = False
+                            f_html.write('<a href=\"' + link_string + '\" target="_blank">' + alt_string + '</a>')
+                            alt_string = ''
+                            link_string = ''
+                        # alt text
+                        elif line_split[i+1] == '](':
+                            alt_string = val
+                        # link text is the only other position
+                        else:
+                            link_string = val
                     # Regular text or special characters caught by RegEx
                     # such as individual [ or ], !, etc.
                     else:
