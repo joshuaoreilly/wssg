@@ -11,7 +11,7 @@ Operates under a couple very simple (but restrictive rules):
     7. No exclamation marks at the end of an image or link (since the ! will get grouped with the ) by RegEx
 
 ToDo:
-    - [ ] Add support for code snippets/monospace fonts (`` and ``` ```)
+    - [ ] Add blockquote support
     - [ ] Add header and footer html
     - [ ] Everything associated with file paths, referencing images and other articles, etc.
 """
