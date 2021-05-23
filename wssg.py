@@ -33,6 +33,19 @@ split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
 """
+Parse style.css file and minify
+"""
+def create_style():
+    style_html = ''
+    if os.path.exists('style.css'):
+        f_style = open('style.css','r')
+        # strip all newlines, tabs and excess spaces
+        style = re.sub(r'[\n\t]*', '', f_style.read())
+        style = re.sub(r'\s{2,}', '', style)
+        style_html = '<style>\n' + style + '\n</style>\n'
+    return style_html
+
+"""
 Traverse files and directories in website root folder.
 Builds the list of navbar elements and begins recursively
 visiting subfolders.
@@ -328,13 +341,7 @@ def prepare_dir():
                 os.rmdir(os.path.join(root, name))
         os.rmdir('public')
     os.mkdir('public')
-    style_html = ''
-    if os.path.exists('style.css'):
-        f_style = open('style.css','r')
-        # strip all newlines, tabs and excess spaces
-        style = re.sub(r'[\n\t]*', '', f_style.read())
-        style = re.sub(r'\s{2,}', '', style)
-        style_html = '<style>\n' + style + '\n</style>\n'
+    style_html = create_style()
     traverse_dirs(os.getcwd(), style_html)
 
 if __name__ == "__main__":
