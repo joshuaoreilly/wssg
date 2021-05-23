@@ -19,6 +19,8 @@ Folder structure operates under a few rules:
 ToDo:
     - [ ] Add blockquote support
     - [ ] Add footer html
+    - [ ] Add CSS support
+    - [ ] Add proper html sections (file beginning, <section>, <div>, etc.)
 """
 
 import os
