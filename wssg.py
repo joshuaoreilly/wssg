@@ -24,7 +24,7 @@ import shutil
 
 """
 Regular expression (Regex) to parse markdown
-Supports headers, links, images, bold, italics
+Supports nav, links, images, bold, italics
 outer () to keep the "splitting content"
 outer [] to split by everything between them
 split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
@@ -33,46 +33,51 @@ split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
 """
-Travers files and folders in the website root folder
-(that which wssg is called from within).
-Builds the list of navbar elements using folder names
+Traverse files and directories in website root folder.
+Builds the list of navbar elements and begins recursively
+visiting subfolders.
+
+root: absolute path to website root
+style_html: minified CSS string to be inserted in <head></head>
 """
 def traverse_dirs(root, style_html):
     files = os.listdir()
     # empty first element is for main page of website
-    headers = ['']
-    # first pass to build list of headers
+    nav = ['']
+    # first pass to build list of nav elements
     for f in files:
         if os.path.isdir(f):
             if f != 'static' and f != 'public' and f [0] != '.':
-                headers.append(f)
+                nav.append(f)
             if f == 'static':
                 shutil.copytree('static','public/static')
     # recursive function to pass over all files
     # ignore public folder and static folder, and dot files (.git)
-    headers_html = create_headers(headers, '')
+    nav_html = create_nav(nav, '')
     for f in files:
         if os.path.isdir(f) and f != 'public' and f != 'static' and f[0] != '.':
             os.mkdir('public/' + f)
-            traverse_dirs_recursive(headers, f, '../', style_html)
+            traverse_dirs_recursive(nav, f, '../', style_html)
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
-            md_to_html(f, 'public/' + f_html, headers_html, style_html)
+            md_to_html(f, 'public/' + f_html, nav_html, style_html)
 
 """
-headers: names of headers
+Recursively traverse files and folders in current folder
+
+nav: names of nav elements
 current_path: indicates path relative to root of website
 backtrack: sequence of ../, ../../, etc. to get back to root
 style_html: css content (until I find a better way of handling this)
 """
-def traverse_dirs_recursive(headers, current_path, backtrack, style_html):
+def traverse_dirs_recursive(nav, current_path, backtrack, style_html):
     files = os.listdir(current_path)
-    headers_html = create_headers(headers, backtrack)
+    nav_html = create_nav(nav, backtrack)
     for f in files:
         # (file or dir)
         if os.path.isdir(current_path + '/' + f):
             os.mkdir('public/' + current_path + '/' + f)
-            traverse_dirs_recursive(headers,
+            traverse_dirs_recursive(nav,
                     current_path + '/' + f,
                     backtrack + '../',
                     style_html)
@@ -80,26 +85,39 @@ def traverse_dirs_recursive(headers, current_path, backtrack, style_html):
             f_html = f[0:-3] + '.html'
             md_to_html(current_path + '/' + f,
                     'public/' + current_path + '/' + f_html,
-                    headers_html,
+                    nav_html,
                     style_html)
 
-def create_headers(headers, backtrack):
-    headers_html = '<header>\n<nav>\n'
+"""
+Create string containing navbar HTML code
+
+nav: list of navigation options
+backtrack: sequence of ../, ../../, etc. to get back to root
+"""
+def create_nav(nav, backtrack):
+    nav_html = '<header>\n<nav>\n'
     # handle first header manually (to main page of website)
-    headers_html += '<a href=\"' + backtrack + 'index.html\">Home</a>\n'
+    nav_html += '<a href=\"' + backtrack + 'index.html\">Home</a>\n'
     # skip first element, handle it manually
-    for i in headers[1:]:
-        headers_html += '<a href=\"' \
+    for i in nav[1:]:
+        nav_html += '<a href=\"' \
                 + backtrack \
                 + i \
                 + '/index.html' \
                 + '\">' \
                 + i \
                 + '</a>\n'
-    headers_html += '</nav>\n</header>\n'
-    return headers_html
+    nav_html += '</nav>\n</header>\n'
+    return nav_html
 
-def md_to_html(file_md_path, file_html_path, headers_html, style_html):
+"""
+Convert the given markdown file into an HTML file
+
+file_md_path: path to target markdown file
+file_html_path: path to location of created HTML file
+style_html: string containing minified CSS
+"""
+def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     f_md = open(file_md_path, 'r')
     f_html = open(file_html_path, 'w')
     
@@ -108,7 +126,7 @@ def md_to_html(file_md_path, file_html_path, headers_html, style_html):
     f_html.write(style_html)
     f_html.write('</head>\n<html>\n<body>\n')
     # insert header html
-    f_html.write(headers_html)
+    f_html.write(nav_html)
     f_html.write('<main>')
 
     # stack to close html expressions for the whole file
@@ -296,6 +314,10 @@ def md_to_html(file_md_path, file_html_path, headers_html, style_html):
     f_md.close()
     f_html.close()
 
+"""
+Remove existing public folder, create new one.
+Begin file and directory traversal
+"""
 def prepare_dir():
     # generate(site_path)
     if os.path.exists('public'):
