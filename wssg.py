@@ -17,6 +17,7 @@ Folder structure operates under a few rules:
     4. The website uses a single css theme located in the root folder, called 'style.css'
 
 ToDo:
+    - [ ] Add support for user input HTML in markdown
     - [ ] Add blockquote support
     - [ ] Add --- support
     - [ ] Add LaTeX support
