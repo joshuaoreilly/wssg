@@ -18,7 +18,7 @@ Folder structure operates under a few rules:
 
 ToDo:
     - [ ] Add blockquote support
-    - [ ] Add header and footer html
+    - [ ] Add footer html
 """
 
 import os
@@ -38,23 +38,25 @@ md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
 def traverse_dirs(root):
     files = os.listdir()
-    headers = []
+    # empty first element is for main page of website
+    headers = ['']
     # first pass to build list of headers
     for f in files:
         if os.path.isdir(f):
-            if f != 'static' or f != 'public':
+            if f != 'static' and f != 'public' and f [0] != '.':
                 headers.append(f)
             if f == 'static':
                 shutil.copytree('static','public/static')
     # recursive function to pass over all files
     # ignore public folder and static folder, and dot files (.git)
+    headers_html = create_headers(headers, '')
     for f in files:
         if os.path.isdir(f) and f != 'public' and f != 'static' and f[0] != '.':
             os.mkdir('public/' + f)
             traverse_dirs_recursive(headers, f, '../')
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
-            parse_md(f, 'public/' + f_html)
+            parse_md(f, 'public/' + f_html, headers_html)
 
 """
 headers: names of headers
@@ -63,6 +65,7 @@ backtrack: sequence of ../, ../../, etc. to get back to root
 """
 def traverse_dirs_recursive(headers, current_path, backtrack):
     files = os.listdir(current_path)
+    headers_html = create_headers(headers, backtrack)
     for f in files:
         # (file or dir)
         if os.path.isdir(f):
@@ -73,11 +76,31 @@ def traverse_dirs_recursive(headers, current_path, backtrack):
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
             parse_md(current_path + '/' + f,
-                    'public/' + current_path + '/' + f_html)
+                    'public/' + current_path + '/' + f_html,
+                    headers_html)
 
-def parse_md(file_md_path, file_html_path):
+def create_headers(headers, backtrack):
+    headers_html = '<nav>\n'
+    # handle first header manually (to main page of website)
+    headers_html += '<a href=\"' + backtrack + 'index.html\">Home</nav>\n'
+    # skip first element, handle it manually
+    for i in headers[1:]:
+        headers_html += '<a href=\"' \
+                + backtrack \
+                + i \
+                + '/index.html' \
+                + '\">' \
+                + i \
+                + '</a>\n'
+    headers_html += '</nav>\n'
+    return headers_html
+
+def parse_md(file_md_path, file_html_path, headers_html):
     f_md = open(file_md_path, 'r')
     f_html = open(file_html_path, 'w')
+
+    # insert header html
+    f_html.write(headers_html)
 
     # stack to close html expressions for the whole file
     file_stack = []
