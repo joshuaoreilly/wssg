@@ -40,7 +40,7 @@ split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 """
 md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
-def traverse_dirs(root):
+def traverse_dirs(root, style_html):
     files = os.listdir()
     # empty first element is for main page of website
     headers = ['']
@@ -57,17 +57,18 @@ def traverse_dirs(root):
     for f in files:
         if os.path.isdir(f) and f != 'public' and f != 'static' and f[0] != '.':
             os.mkdir('public/' + f)
-            traverse_dirs_recursive(headers, f, '../')
+            traverse_dirs_recursive(headers, f, '../', style_html)
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
-            md_to_html(f, 'public/' + f_html, headers_html)
+            md_to_html(f, 'public/' + f_html, headers_html, style_html)
 
 """
 headers: names of headers
 current_path: indicates path relative to root of website
 backtrack: sequence of ../, ../../, etc. to get back to root
+style_html: css content (until I find a better way of handling this)
 """
-def traverse_dirs_recursive(headers, current_path, backtrack):
+def traverse_dirs_recursive(headers, current_path, backtrack, style_html):
     files = os.listdir(current_path)
     headers_html = create_headers(headers, backtrack)
     for f in files:
@@ -76,12 +77,14 @@ def traverse_dirs_recursive(headers, current_path, backtrack):
             os.mkdir('public/' + current_path + '/' + f)
             traverse_dirs_recursive(headers,
                     current_path + '/' + f,
-                    backtrack + '../')
+                    backtrack + '../',
+                    style_html)
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
             md_to_html(current_path + '/' + f,
                     'public/' + current_path + '/' + f_html,
-                    headers_html)
+                    headers_html,
+                    style_html)
 
 def create_headers(headers, backtrack):
     headers_html = '<header>\n<nav>\n'
@@ -99,12 +102,14 @@ def create_headers(headers, backtrack):
     headers_html += '</nav>\n</header>\n'
     return headers_html
 
-def md_to_html(file_md_path, file_html_path, headers_html):
+def md_to_html(file_md_path, file_html_path, headers_html, style_html):
     f_md = open(file_md_path, 'r')
     f_html = open(file_html_path, 'w')
     
     # insert necessary HTML preamble
-    f_html.write('<!DOCTYPE html>\n<head>\n<meta charset="utf-8"/>\n</head>\n<html>\n<body>\n')
+    f_html.write('<!DOCTYPE html>\n<head>\n<meta charset="utf-8"/>\n')
+    f_html.write(style_html)
+    f_html.write('</head>\n<html>\n<body>\n')
     # insert header html
     f_html.write(headers_html)
     f_html.write('<main>')
@@ -308,4 +313,10 @@ if __name__ == "__main__":
                 os.rmdir(os.path.join(root, name))
         os.rmdir('public')
     os.mkdir('public')
-    traverse_dirs(os.getcwd())
+    style_html = ''
+    if os.path.exists('style.css'):
+        f_style = open('style.css','r')
+        # strip all newlines, tabs and spaces
+        style = re.sub(r'[\n\t\s]*', '', f_style.read())
+        style_html = '<style>\n' + style + '\n</style>\n'
+    traverse_dirs(os.getcwd(), style_html)
