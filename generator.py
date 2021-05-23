@@ -316,7 +316,8 @@ if __name__ == "__main__":
     style_html = ''
     if os.path.exists('style.css'):
         f_style = open('style.css','r')
-        # strip all newlines, tabs and spaces
-        style = re.sub(r'[\n\t\s]*', '', f_style.read())
+        # strip all newlines, tabs and excess spaces
+        style = re.sub(r'[\n\t]*', '', f_style.read())
+        style = re.sub(r'\s{2,}', '', style)
         style_html = '<style>\n' + style + '\n</style>\n'
     traverse_dirs(os.getcwd(), style_html)
