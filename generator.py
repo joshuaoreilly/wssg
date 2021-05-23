@@ -58,7 +58,7 @@ def traverse_dirs(root):
             traverse_dirs_recursive(headers, f, '../')
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
-            parse_md(f, 'public/' + f_html, headers_html)
+            md_to_html(f, 'public/' + f_html, headers_html)
 
 """
 headers: names of headers
@@ -77,7 +77,7 @@ def traverse_dirs_recursive(headers, current_path, backtrack):
                     backtrack + '../')
         elif f[-3:] == '.md':
             f_html = f[0:-3] + '.html'
-            parse_md(current_path + '/' + f,
+            md_to_html(current_path + '/' + f,
                     'public/' + current_path + '/' + f_html,
                     headers_html)
 
@@ -97,7 +97,7 @@ def create_headers(headers, backtrack):
     headers_html += '</nav>\n'
     return headers_html
 
-def parse_md(file_md_path, file_html_path, headers_html):
+def md_to_html(file_md_path, file_html_path, headers_html):
     f_md = open(file_md_path, 'r')
     f_html = open(file_html_path, 'w')
 
@@ -292,7 +292,6 @@ def generate():
 
 if __name__ == "__main__":
     # generate(site_path)
-    # parse_md('md.md','md.html')
     if os.path.exists('public'):
         for root, dirs, files in os.walk('public', topdown=False):
             for name in files:
