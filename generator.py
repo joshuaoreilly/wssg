@@ -22,7 +22,7 @@ ToDo:
     - [ ] Add LaTeX support
     - [ ] Add footer html
     - [ ] Add CSS support
-    - [ ] Add proper html sections (file beginning, <section>, <div>, etc.)
+    - [ ] Add proper html sections (<section>, <div>, etc.)
 """
 
 import os
@@ -84,9 +84,9 @@ def traverse_dirs_recursive(headers, current_path, backtrack):
                     headers_html)
 
 def create_headers(headers, backtrack):
-    headers_html = '<nav>\n'
+    headers_html = '<header>\n<nav>\n'
     # handle first header manually (to main page of website)
-    headers_html += '<a href=\"' + backtrack + 'index.html\">Home</nav>\n'
+    headers_html += '<a href=\"' + backtrack + 'index.html\">Home</a>\n'
     # skip first element, handle it manually
     for i in headers[1:]:
         headers_html += '<a href=\"' \
@@ -96,15 +96,18 @@ def create_headers(headers, backtrack):
                 + '\">' \
                 + i \
                 + '</a>\n'
-    headers_html += '</nav>\n'
+    headers_html += '</nav>\n</header>\n'
     return headers_html
 
 def md_to_html(file_md_path, file_html_path, headers_html):
     f_md = open(file_md_path, 'r')
     f_html = open(file_html_path, 'w')
-
+    
+    # insert necessary HTML preamble
+    f_html.write('<!DOCTYPE html>\n<head>\n<meta charset="utf-8"/>\n</head>\n<html>\n<body>\n')
     # insert header html
     f_html.write(headers_html)
+    f_html.write('<main>')
 
     # stack to close html expressions for the whole file
     file_stack = []
@@ -285,6 +288,9 @@ def md_to_html(file_md_path, file_html_path, headers_html):
         f_html.write(file_stack.pop())
         f_html.write('\n')
     
+    # close open HTML tags
+    f_html.write('</main>\n</body>\n</html>\n')
+
     f_md.close()
     f_html.close()
 
