@@ -15,14 +15,6 @@ Folder structure operates under a few rules:
     2. Folders 'static' and 'public' are reserved for static content (images, pdfs, etc.) and the generated html website
     3. Markdown files must have the file extension .md
     4. The website uses a single css theme located in the root folder, called 'style.css'
-
-ToDo:
-    - [ ] Add support for user input HTML in markdown
-    - [ ] Add blockquote support
-    - [ ] Add --- support
-    - [ ] Add LaTeX support
-    - [ ] Add footer html
-    - [ ] Add proper html sections (<section>, <div>, etc.)
 """
 
 import os
