@@ -70,7 +70,7 @@ def traverse_dirs_recursive(headers, current_path, backtrack):
     headers_html = create_headers(headers, backtrack)
     for f in files:
         # (file or dir)
-        if os.path.isdir(f):
+        if os.path.isdir(current_path + '/' + f):
             os.mkdir('public/' + current_path + '/' + f)
             traverse_dirs_recursive(headers,
                     current_path + '/' + f,
