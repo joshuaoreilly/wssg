@@ -21,7 +21,6 @@ ToDo:
     - [ ] Add --- support
     - [ ] Add LaTeX support
     - [ ] Add footer html
-    - [ ] Add CSS support
     - [ ] Add proper html sections (<section>, <div>, etc.)
 """
 
@@ -299,11 +298,7 @@ def md_to_html(file_md_path, file_html_path, headers_html, style_html):
     f_md.close()
     f_html.close()
 
-def generate():
-    root = os.getcwd()
-    files = get_files(root) 
-
-if __name__ == "__main__":
+def prepare_dir():
     # generate(site_path)
     if os.path.exists('public'):
         for root, dirs, files in os.walk('public', topdown=False):
@@ -321,3 +316,6 @@ if __name__ == "__main__":
         style = re.sub(r'\s{2,}', '', style)
         style_html = '<style>\n' + style + '\n</style>\n'
     traverse_dirs(os.getcwd(), style_html)
+
+if __name__ == "__main__":
+    prepare_dir()
