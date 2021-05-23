@@ -11,7 +11,7 @@ Markdown parsing operates under a few rules:
     7. No exclamation marks at the end of an image or link (since the ! will get grouped with the ) by RegEx
 
 Folder structure operates under a few rules:
-    1. Website headers are generated using folders in root of website
+    1. Website navbar are generated using folders in root of website
     2. Folders 'static' and 'public' are reserved for static content (images, pdfs, etc.) and the generated html website
     3. Markdown files must have the file extension .md
     4. The website uses a single css theme located in the root folder, called 'style.css'
@@ -32,6 +32,11 @@ split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 """
 md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
+"""
+Travers files and folders in the website root folder
+(that which wssg is called from within).
+Builds the list of navbar elements using folder names
+"""
 def traverse_dirs(root, style_html):
     files = os.listdir()
     # empty first element is for main page of website
