@@ -1,7 +1,7 @@
 """
 Generates Static Website
 
-Operates under a couple very simple (but restrictive rules):
+Markdown parsing operates under a few rules:
     1. All markup must begin and end on the same line
     2. Image references use the img folder as their root
     3. Hyperlinks to other parts of the website are done using the live link (no intelligent deduction here)
@@ -10,15 +10,21 @@ Operates under a couple very simple (but restrictive rules):
     6. Links using []() will have no markup in the link text enclosed in []
     7. No exclamation marks at the end of an image or link (since the ! will get grouped with the ) by RegEx
 
+Folder structure operates under a few rules:
+    1. Website headers are generated using folders in root of website
+    2. Folders 'static' and 'public' are reserved for static content (images, pdfs, etc.) and the generated html website
+    3. Markdown files must have the file extension .md
+    4. The website uses a single css theme located in the root folder, called 'style.css'
+
 ToDo:
     - [ ] Add blockquote support
     - [ ] Add header and footer html
-    - [ ] Everything associated with file paths, referencing images and other articles, etc.
 """
 
 import os
 import io
 import re
+import shutil
 
 """
 Regular expression (Regex) to parse markdown
@@ -30,12 +36,44 @@ split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 """
 md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
 
-def get_files(root):
-    files = []
-    for dirpath, dirnames, filenames in os.walk(root):
-        for f in filenames:
-            files.append(os.path.join(dirpath,f))
-    return files
+def traverse_dirs(root):
+    files = os.listdir()
+    headers = []
+    # first pass to build list of headers
+    for f in files:
+        if os.path.isdir(f):
+            if f != 'static' or f != 'public':
+                headers.append(f)
+            if f == 'static':
+                shutil.copytree('static','public/static')
+    # recursive function to pass over all files
+    # ignore public folder and static folder, and dot files (.git)
+    for f in files:
+        if os.path.isdir(f) and f != 'public' and f != 'static' and f[0] != '.':
+            os.mkdir('public/' + f)
+            traverse_dirs_recursive(headers, f, '../')
+        elif f[-3:] == '.md':
+            f_html = f[0:-3] + '.html'
+            parse_md(f, 'public/' + f_html)
+
+"""
+headers: names of headers
+current_path: indicates path relative to root of website
+backtrack: sequence of ../, ../../, etc. to get back to root
+"""
+def traverse_dirs_recursive(headers, current_path, backtrack):
+    files = os.listdir(current_path)
+    for f in files:
+        # (file or dir)
+        if os.path.isdir(f):
+            os.mkdir('public/' + current_path + '/' + f)
+            traverse_dirs_recursive(headers,
+                    current_path + '/' + f,
+                    backtrack + '../')
+        elif f[-3:] == '.md':
+            f_html = f[0:-3] + '.html'
+            parse_md(current_path + '/' + f,
+                    'public/' + current_path + '/' + f_html)
 
 def parse_md(file_md_path, file_html_path):
     f_md = open(file_md_path, 'r')
@@ -229,4 +267,13 @@ def generate():
 
 if __name__ == "__main__":
     # generate(site_path)
-    parse_md('md.md','md.html')
+    # parse_md('md.md','md.html')
+    if os.path.exists('public'):
+        for root, dirs, files in os.walk('public', topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir('public')
+    os.mkdir('public')
+    traverse_dirs(os.getcwd())
