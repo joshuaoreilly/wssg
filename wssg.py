@@ -297,7 +297,7 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
                         # end of link, create the string and write it to the file
                         elif val == ')':
                             is_link = False
-                            f_html.write('<a href=\"' + link_string + '\" target="_blank">' + alt_string + '</a>')
+                            f_html.write('<a href=\"' + link_string + '\">' + alt_string + '</a>')
                             alt_string = ''
                             link_string = ''
                         # alt text
