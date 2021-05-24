@@ -332,17 +332,21 @@ Remove existing public folder, create new one.
 Begin file and directory traversal
 """
 def prepare_dir():
-    # generate(site_path)
-    if os.path.exists('public'):
-        for root, dirs, files in os.walk('public', topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir('public')
-    os.mkdir('public')
-    style_html = create_style()
-    traverse_dirs(os.getcwd(), style_html)
+    # check if program called in website folder containing .wssg file
+    if os.path.exists('.wssg'):
+        # generate(site_path)
+        if os.path.exists('public'):
+            for root, dirs, files in os.walk('public', topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+            os.rmdir('public')
+        os.mkdir('public')
+        style_html = create_style()
+        traverse_dirs(os.getcwd(), style_html)
+    else:
+        print('No .wssg file found, exiting')
 
 if __name__ == "__main__":
     prepare_dir()
