@@ -135,12 +135,12 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     f_html = open(file_html_path, 'w')
     
     # insert necessary HTML preamble
-    f_html.write('<!DOCTYPE html>\n<head>\n<meta charset="utf-8"/>\n')
+    f_html.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8"/>\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n')
     f_html.write(style_html)
-    f_html.write('</head>\n<html>\n<body>\n')
+    f_html.write('</head>\n<body>\n')
     # insert header html
     f_html.write(nav_html)
-    f_html.write('<main>')
+    f_html.write('<main>\n')
 
     # stack to close html expressions for the whole file
     file_stack = []
