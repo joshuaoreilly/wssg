@@ -1,5 +1,6 @@
 # ToDo
 
+- [ ] Add support for relative hyperlinks (including markdown files to html)
 - [ ] Add support for user input HTML in markdown
 - [ ] Add blockquote support
 - [ ] Add --- support
