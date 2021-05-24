@@ -7,7 +7,7 @@ It converts markdown files to HTML files using a strict file hierarchy.
 
 ## Should I use this?
 
-Absolutely not; wssg is a fun little side project which, in its current form, isn't even close to feature complete and is chock-full of bugs (see `TODO.md` for an incomplete list).
+Absolutely not; wssg is a fun little side project which, in its current form, isn't even close to feature complete and is chock-full of bugs (see `TODO.md` for an incomplete list, and the beginning of `wssg.py` for the current rules).
 
 ## Installation
 
