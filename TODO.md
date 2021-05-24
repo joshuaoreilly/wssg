@@ -1,5 +1,7 @@
 # ToDo
 
+- [ ] Remove use of RegEx for parsing (this introduced the issue below) and replace with character by character parsing (and proper state machine?)
+- [ ] Allow for special characters (-,#, etc. caught by RegEx) in hyperlinks; otherwise, you can't have dashes in hyperlinks!
 - [ ] Add support for relative hyperlinks (including markdown files to html)
 - [ ] Add support for user input HTML in markdown
 - [ ] Add blockquote support
