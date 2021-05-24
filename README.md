@@ -7,7 +7,7 @@ It converts markdown files to HTML files using a strict file hierarchy.
 
 ## Should I use this?
 
-Absolutely not; wssg is currently a fun little side project which, in its current form, isn't even close to feature complete and is chock-full of bugs (see `TODO.md` for an incomplete list).
+Absolutely not; wssg is a fun little side project which, in its current form, isn't even close to feature complete and is chock-full of bugs (see `TODO.md` for an incomplete list).
 
 ## Installation
 
@@ -25,16 +25,19 @@ website/
 	static/
 	Folder1/
 		index.md
+		afile.md
 		...
 	Folder2/
 		index.md
+		anotherfile.md
 		...
 	.../
 ```
 
-wssg looks for the `.wssg` file to ensure it is run in the correct folder; the content of the file is not important.
+wssg looks for the `.wssg` file to ensure it is run in the correct folder; the content of the file is not checked.
 Images, favicons, pdfs, and all other static content should be stored in the `static/` folder.
 Folder names (other than `static/`) become the elements of the navbar; they link to their respective index files.
+The above folder structure would create a navbar with three elements; Home (automatically generated and points to the top-level `index.md` file), Folder1, and Folder2.
 
 Images and links to other parts of your website should be done using relative links.
 For example, a link to `test.png` in the index file of `Folder1/` would have the following form:
@@ -43,4 +46,4 @@ For example, a link to `test.png` in the index file of `Folder1/` would have the
 ![caption](../static/test.png)
 ```
 
-If you'd like an example site, visit `example/public/` or [joshuaoreilly.com](joshuaoreilly.com).
+If you'd like to see an example site, visit `example/public/` or [joshuaoreilly.com](joshuaoreilly.com).
