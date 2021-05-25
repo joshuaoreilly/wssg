@@ -30,7 +30,7 @@ outer [] to split by everything between them
 split by !, #, *, [, ], (, ), \u0060 (backtick, doesn't work using `)
 + to keep groups of these together (so **, ![, ###, etc.)
 """
-md_pattern = re.compile(r'([-!#\*\[\]\(\)\u0060]+)')
+md_pattern = re.compile(r'([!#\*\[\]\(\)\u0060]+)')
 
 """
 Parse style.css file and minify
@@ -194,20 +194,23 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
                         f_html.write('<h3>')
                         line_stack.append('</h3>')
                 # Unordered List
-                elif i == 0 and val == '-':
-                    if is_ordered_list:
-                        f_html.write('<li>')
-                    else:
-                        is_ordered_list = True
-                        f_html.write('<ul>\n<li>')
-                        file_stack.append('</ul>')
-                    line_stack.append('</li>')
-                # Ordered List
-                elif i == 0 and val[0].isdigit() and val[1] == '.':
+                elif i == 0 and val[0] == '-':
                     if is_unordered_list:
                         f_html.write('<li>')
                     else:
                         is_unordered_list = True
+                        f_html.write('<ul>\n<li>')
+                        file_stack.append('</ul>')
+                    # assume second character is a space
+                    if len(val) > 2:
+                        f_html.write(val[2:])
+                    line_stack.append('</li>')
+                # Ordered List
+                elif i == 0 and val[0].isdigit() and val[1] == '.':
+                    if is_ordered_list:
+                        f_html.write('<li>')
+                    else:
+                        is_ordered_list = True
                         f_html.write('<ol>\n<li>')
                         file_stack.append('</ol>')
                     f_html.write(val[2:])
