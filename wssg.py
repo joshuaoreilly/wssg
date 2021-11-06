@@ -135,7 +135,7 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     f_html = open(file_html_path, 'w')
     
     # insert necessary HTML preamble
-    f_html.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8"/>\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n')
+    f_html.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8"/>\n<meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n<meta name="theme-color" content="#c2f4d1">\n<link rel="icon" href="https://joshuaoreilly.com/static/favicon.png">\n')
     f_html.write(style_html)
     f_html.write('</head>\n<body>\n')
     # insert header html
