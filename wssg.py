@@ -176,12 +176,21 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
             is_unordered_list = False
             is_paragraph = False
             is_header = False
-            is_code = False
         # Content line
         else:
             for i, val in enumerate(line_split):
+                # Code block; evaluated first so that not other option can be applied
+                if i == 0 and val == '```':
+                    if is_code:
+                        is_code = False
+                        f_html.write('</code></pre>')
+                    else:
+                        is_code = True
+                        f_html.write('<pre><code>')
+                elif is_code:
+                    f_html.write(val)
                 # Header
-                if i == 0 and val[0] == '#':
+                elif i == 0 and val[0] == '#':
                     is_header = True
                     val_len = len(val)
                     if val_len == 1:
@@ -215,16 +224,6 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
                         file_stack.append('</ol>')
                     f_html.write(val[2:])
                     line_stack.append('</li>')
-                # Code block
-                elif i == 0 and val == '```':
-                    if is_code:
-                        is_code = False
-                        f_html.write('</code></pre>')
-                    else:
-                        is_code = True
-                        f_html.write('<pre><code>')
-                elif is_code:
-                    f_html.write(val)
                 # Image opening
                 elif val == '![' and line_split[i+2] == '](' and line_split[i+4] == ')':
                     is_image = True
