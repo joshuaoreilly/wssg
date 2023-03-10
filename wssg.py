@@ -9,6 +9,7 @@ Markdown parsing operates under a few rules:
     5. No nested lists
     6. Links using []() will have no markup in the link text enclosed in []
     7. No exclamation marks at the end of an image or link (since the ! will get grouped with the ) by RegEx
+    8. Page/file title must be on the first line of the file
 
 Folder structure operates under a few rules:
     1. Website navbar are generated using folders in root of website
@@ -136,6 +137,11 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     
     # insert necessary HTML preamble
     f_html.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="theme-color" content="#c2f4d1">\n<link rel="icon" href="https://joshuaoreilly.com/static/favicon.png">\n')
+    # sloppy way of getting title
+    title = f_md.readline().strip('#').strip()
+    f_html.write('<title>' + title + '</title>\n')
+    f_md.close()
+    f_md = open(file_md_path, 'r')
     f_html.write(style_html)
     f_html.write('</head>\n<body>\n')
     # insert header html
