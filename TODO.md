@@ -8,7 +8,7 @@
 - [ ] Add --- support
 - [ ] Add LaTeX support
 - [ ] Add footer html
-- [ ] Add proper html sections (<section>, <div>, etc.)
+- [ ] Add proper html sections (`<section>`, `<div>`, etc.)
 
 ## Completed
 
