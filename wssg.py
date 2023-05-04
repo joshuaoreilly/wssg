@@ -168,6 +168,8 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     
     # open returns iterable object, allowing for easy line-by-line
     for line in f_md:
+        f_html.write(handle_line(line).strip())
+        continue
         # remove newline characters
         line = line.rstrip()
         line_split = re.split(md_pattern,line)
@@ -334,6 +336,101 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
 
     f_md.close()
     f_html.close()
+
+def handle_line(line):
+    html = ''
+    line_stack = ['']
+    index = 0
+    while index < len(line):
+        char = line[index]
+        if char == '`':
+            if line_stack[-1] == '</code>':
+                html += line_stack.pop()
+            else:
+                html += '<code>'
+                line_stack.append('</code>')
+        elif char == '*':
+            if index+2 < len(line) and line[index+1] == '*' and line[index+2] == '*':
+                index += 2
+                if line_stack[-1] == '</i></b>':
+                    html += line_stack.pop()
+                else:
+                    html += '<b><i>'
+                    line_stack.append('</i></b>')
+            elif index+1 < len(line) and line[index+1] == '*':
+                index += 1
+                if line_stack[-1] == '</b>':
+                    html += line_stack.pop()
+                else:
+                    html += '<b>'
+                    line_stack.append('</b>')
+            else:
+                if line_stack[-1] == '</i>':
+                        html += line_stack.pop()
+                else:
+                    html += '<i>'
+                    line_stack.append('</i>')
+        elif char == '\\':
+            if index+1 < len(line):
+                index += 1
+                next_char = line[index]
+                html += next_char
+        elif char == '!':
+            if index+1 < len(line):
+                if line[index+1] == '[':
+                    alt_text, link, new_index = handle_link(index+2, line)
+                    index = new_index
+                    html += f'<img src="{link}" alt="{alt_text}">'
+                else:
+                    html += char
+            else:
+                html += '!'
+        elif char == '[':
+            if index+1 < len(line):
+                alt_text, link, new_index = handle_link(index+1, line)
+                index = new_index
+                html += f'<a href="{link}">{alt_text}</a>'
+            else:
+                html += char
+        else:
+            html += char
+        index += 1
+    while len(line_stack) != 0:
+        html += line_stack.pop()
+    print(html)
+    print(html == '')
+    print(html == '\n')
+    return html
+
+"""
+Handle both images and URLs, since both contain an alt text and a link
+"""
+def handle_link(index, line):
+    end_found = False
+    alt_text_done = False
+    alt_text = ''
+    link = ''
+    while not end_found:
+        char = line[index]
+        if char == ']' and (index+1) < len(line):
+            next_char = line[index+1]
+            if next_char == '(':
+                alt_text_done = True
+                index += 1
+            else:
+                alt_text += ']'
+        elif char == ')' and alt_text_done:
+            end_found = True
+        else:
+            if not alt_text_done:
+                alt_text += char
+            else:
+                link += char
+        index += 1
+        if index >= len(line):
+            end_found = True
+            # minus one since handle_line automatically increments index at the end of each loop iteration
+    return alt_text, link, index-1
 
 """
 Remove existing public folder, create new one.
