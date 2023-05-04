@@ -167,6 +167,12 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
     link_string = ''
     
     # open returns iterable object, allowing for easy line-by-line
+    line = f_md.readline()
+    while line:
+        if line != '\n':
+            handle_block(line, f_md, f_html)
+        line = f_md.readline()
+    """
     for line in f_md:
         f_html.write(handle_line(line).strip())
         continue
@@ -325,6 +331,7 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
             while len(line_stack) > 0:
                 f_html.write(line_stack.pop())
             f_html.write('\n')
+    """
     
     # Empty the file stack
     while len(file_stack) > 0:
@@ -336,6 +343,11 @@ def md_to_html(file_md_path, file_html_path, nav_html, style_html):
 
     f_md.close()
     f_html.close()
+
+def handle_block(line, f_md, f_html):
+    while line and line != '\n':
+        f_html.write(handle_line(line))
+        line = f_md.readline()
 
 def handle_line(line):
     html = ''
@@ -397,9 +409,6 @@ def handle_line(line):
         index += 1
     while len(line_stack) != 0:
         html += line_stack.pop()
-    print(html)
-    print(html == '')
-    print(html == '\n')
     return html
 
 """
