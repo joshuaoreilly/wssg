@@ -47,3 +47,4 @@ For example, a link to `test.png` in the index file of `Folder1/` would have the
 ```
 
 If you'd like to see an example site, visit `example/public/` or [joshuaoreilly.com](https://joshuaoreilly.com/).
+
