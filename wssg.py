@@ -182,8 +182,9 @@ def handle_block(line, f_md, f_html):
     elif re.match(r"#+ ", line) != None:
         regex_match = re.match(r"#+ ", line)
         markdown_prefix = 'header'
-        html_prefix = f'<h{len(regex_match[0])}>'
-        html_suffix = f'</h{len(regex_match[0])}>'
+        # -1 since the space after the # is included in len()
+        html_prefix = f'<h{len(regex_match[0])-1}>'
+        html_suffix = f'</h{len(regex_match[0])-1}>'
         block_suffix = ''
     elif line[0:3] == '```':
         markdown_prefix = '```'
