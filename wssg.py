@@ -41,7 +41,7 @@ root: absolute path to website root
 style_html: minified CSS string to be inserted in <head></head>
 """
 def traverse_dirs(root, style_html):
-    files = os.listdir()
+    files = sorted(os.listdir())
     # empty first element is for main page of website
     nav = ['']
     # first pass to build list of nav elements
