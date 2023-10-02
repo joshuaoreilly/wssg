@@ -47,15 +47,15 @@ def traverse_dirs(root, style_html):
     # first pass to build list of nav elements
     for f in files:
         if os.path.isdir(f):
-            if f != 'static' and f != 'public' and f [0] != '.':
+            if f in {'static', 'js', 'libs'}:
+                shutil.copytree(f, 'public/' + f)
+            elif f != 'public' and f[0] != '.':
                 nav.append(f)
-            if f == 'static':
-                shutil.copytree('static','public/static')
     # recursive function to pass over all files
     # ignore public folder and static folder, and dot files (.git)
     nav_html = create_nav(nav, '')
     for f in files:
-        if os.path.isdir(f) and f != 'public' and f != 'static' and f[0] != '.':
+        if os.path.isdir(f) and f not in {'static', 'js', 'libs', 'public'} and f[0] != '.':
             os.mkdir('public/' + f)
             traverse_dirs_recursive(nav, f, '../', style_html)
         elif f[-3:] == '.md':

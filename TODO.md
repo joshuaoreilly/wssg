@@ -1,5 +1,6 @@
 # ToDo
 
+- [ ] Some kind of YAML support to allow for loading javascript on request (such as the A-Star page)
 - [ ] Add --- support
 - [ ] Add LaTeX support
 - [ ] Add footer html
