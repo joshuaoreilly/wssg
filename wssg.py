@@ -297,6 +297,14 @@ def handle_line(line):
                 html += f'<a href="{link}">{alt_text}</a>'
             else:
                 html += char
+        elif char == '~':
+            if line[index+1] == '~':
+                index += 1
+                if line_stack[-1] == '</s>':
+                    html += line_stack.pop()
+                else:
+                    html += '<s>'
+                    line_stack.append('</s>')
         else:
             html += char
         index += 1
